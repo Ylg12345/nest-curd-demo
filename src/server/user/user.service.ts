@@ -22,11 +22,8 @@ export class UserService {
   }
 
   async addOne(body: CreateUserDTO): Promise<void> {
-    const { _id, user_name, password } = body;
+    const { _id } = body;
     const existUser = await this.userModel.findById(_id);
-    if (!_id || !user_name || !password) {
-      throw new HttpException('缺少属性', HttpStatus.BAD_REQUEST);
-    }
     if (existUser) {
       throw new HttpException('用户已存在', HttpStatus.BAD_REQUEST);
     }

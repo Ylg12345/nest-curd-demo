@@ -8,6 +8,8 @@ import {
   Put,
   UseInterceptors,
   UseFilters,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserDTO, EditUserDTO } from './user.dto';
@@ -35,6 +37,7 @@ export class UserController {
   }
 
   @Post()
+  @UsePipes(new ValidationPipe())
   async addOne(@Body() body: CreateUserDTO): Promise<void> {
     return await this.userService.addOne(body);
   }
