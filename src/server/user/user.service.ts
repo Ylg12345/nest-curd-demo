@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDTO, EditUserDTO } from './user.dto';
@@ -14,18 +14,38 @@ export class UserService {
   }
 
   async findOne(_id: string): Promise<User> {
-    return await this.userModel.findById(_id);
+    const user = await this.userModel.findById(_id);
+    if (!user) {
+      throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);
+    }
+    return user;
   }
 
   async addOne(body: CreateUserDTO): Promise<void> {
+    const { _id, user_name, password } = body;
+    const existUser = await this.userModel.findById(_id);
+    if (!_id || !user_name || !password) {
+      throw new HttpException('缺少属性', HttpStatus.BAD_REQUEST);
+    }
+    if (existUser) {
+      throw new HttpException('用户已存在', HttpStatus.BAD_REQUEST);
+    }
     await this.userModel.create(body);
   }
 
   async editOne(_id: string, body: EditUserDTO): Promise<void> {
+    const existUser = await this.userModel.findById(_id);
+    if (!existUser) {
+      throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);
+    }
     await this.userModel.findByIdAndUpdate(_id, body);
   }
 
   async deleteOne(_id: string): Promise<void> {
+    const existUser = await this.userModel.findById(_id);
+    if (!existUser) {
+      throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);
+    }
     await this.userModel.findByIdAndDelete(_id);
   }
 }
