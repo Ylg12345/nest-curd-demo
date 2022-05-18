@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateUserDTO, EditUserDTO } from './user.dto';
+import { CreateUserDTO } from './dto/create-user.dto';
+import { EditUserDTO } from './dto/update-user.dto';
 import { User } from './user.interface';
 
 @Injectable()
@@ -21,9 +22,17 @@ export class UserService {
     return user;
   }
 
+  async findByUsername(username: string) {
+    return this.userModel.findOne({
+      where: { username },
+    });
+  }
+
   async addOne(body: CreateUserDTO): Promise<void> {
-    const { _id } = body;
-    const existUser = await this.userModel.findById(_id);
+    const { user_name } = body;
+    const existUser = this.userModel.findOne({
+      where: { user_name },
+    });
     if (existUser) {
       throw new HttpException('用户已存在', HttpStatus.BAD_REQUEST);
     }

@@ -15,7 +15,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let validMessage = '';
 
     for (const key in exception) {
-      console.log(key, exception[key]);
+      // console.log(key, exception[key]);
     }
 
     if (typeof exceptionResponse === 'object') {
