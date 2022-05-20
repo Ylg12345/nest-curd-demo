@@ -42,6 +42,7 @@ export class UserService {
   }
 
   async editOne(_id: string, body: EditUserDTO): Promise<void> {
+    body = { ...body, password: hashSync(body.password) };
     const existUser = await this.userModel.findById(_id);
     if (!existUser) {
       throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);

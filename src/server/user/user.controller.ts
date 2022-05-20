@@ -44,6 +44,8 @@ export class UserController {
   }
 
   @ApiOperation({ summary: '修改用户' })
+  @UseGuards(JwtAuthGuardUser)
+  @ApiBearerAuth()
   @Put(':_id')
   async editOne(
     @Param('_id') _id: string,
@@ -53,6 +55,8 @@ export class UserController {
   }
 
   @ApiOperation({ summary: '删除用户' })
+  @UseGuards(JwtAuthGuardUser)
+  @ApiBearerAuth()
   @Delete(':_id')
   async deleteOne(@Param('_id') _id: string): Promise<void> {
     return await this.userService.deleteOne(_id);
