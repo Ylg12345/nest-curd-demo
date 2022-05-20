@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import { compareSync } from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
@@ -11,16 +12,20 @@ export class AuthService {
 
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.usersService.findByUsername(username);
-    if (user && user.password === password) {
-      const result = { password, ...user };
-      return result;
+    if (!user) {
+      return user;
     }
-    return null;
+    if (user && compareSync(password, user.password)) {
+      return user;
+    }
+    if (!compareSync(password, user.password)) {
+      throw new BadRequestException('密码不正确');
+    }
   }
 
   // 登录
   async login(user: any) {
-    const payload = { username: user.user_name, sub: user._id };
+    const payload = { username: user.username, sub: user._id };
     return {
       access_token: this.jwtService.sign(payload),
     };

@@ -5,7 +5,7 @@ export class CreateUserDTO {
   @ApiProperty({ description: '用户名' })
   @IsString()
   @IsNotEmpty({ message: '用户名不能为空' })
-  user_name: string;
+  username: string;
 
   @ApiProperty({ description: '密码' })
   @IsString()

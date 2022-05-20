@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { EditUserDTO } from './dto/update-user.dto';
 import { User } from './user.interface';
+import { hashSync } from 'bcryptjs';
 
 @Injectable()
 export class UserService {
@@ -24,15 +25,16 @@ export class UserService {
 
   async findByUsername(username: string) {
     return this.userModel.findOne({
-      where: { username },
+      username,
     });
   }
 
   async addOne(body: CreateUserDTO): Promise<void> {
-    const { user_name } = body;
-    const existUser = this.userModel.findOne({
-      where: { user_name },
-    });
+    body = { ...body, password: hashSync(body.password) };
+    const { username } = body;
+    const existUser = await this.userModel
+      .findOne({ username })
+      .select(username);
     if (existUser) {
       throw new HttpException('用户已存在', HttpStatus.BAD_REQUEST);
     }

@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuardUser } from '../auth/guards/jwt-auth.guard';
-import { LocalAuthGuardUser } from '../auth/guards/local-auth.guard';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { EditUserDTO } from './dto/update-user.dto';
 import { User } from './user.interface';
@@ -24,22 +23,20 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOperation({ summary: '获取全部用户' })
-  @UseGuards(JwtAuthGuardUser)
-  @ApiBearerAuth()
   @Get('users')
   async findAll(): Promise<User[]> {
     return await this.userService.findAll();
   }
 
   @ApiOperation({ summary: '根据_id查找用户' })
+  @UseGuards(JwtAuthGuardUser)
+  @ApiBearerAuth()
   @Get(':_id')
   async findOne(@Param('_id') _id: string): Promise<User> {
     return await this.userService.findOne(_id);
   }
 
   @ApiOperation({ summary: '用户注册' })
-  @UseGuards(JwtAuthGuardUser)
-  @ApiBearerAuth()
   @Post('rigster')
   @UsePipes(new ValidationPipe())
   async addOne(@Body() body: CreateUserDTO): Promise<void> {
