@@ -4,11 +4,14 @@ import { Model } from 'mongoose';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { EditUserDTO } from './dto/update-user.dto';
 import { User } from './user.interface';
-import { hashSync } from 'bcryptjs';
 
 @Injectable()
 export class UserService {
   constructor(@InjectModel('Users') private readonly userModel: Model<User>) {}
+
+  async findByUsername(username: string) {
+    return await this.userModel.findOne({ username }).select('+password');
+  }
 
   async findAll(): Promise<User[]> {
     const users = await this.userModel.find();
@@ -23,18 +26,9 @@ export class UserService {
     return user;
   }
 
-  async findByUsername(username: string) {
-    return this.userModel.findOne({
-      username,
-    });
-  }
-
   async addOne(body: CreateUserDTO): Promise<void> {
-    body = { ...body, password: hashSync(body.password) };
     const { username } = body;
-    const existUser = await this.userModel
-      .findOne({ username })
-      .select(username);
+    const existUser = await this.findByUsername(username);
     if (existUser) {
       throw new HttpException('用户已存在', HttpStatus.BAD_REQUEST);
     }
@@ -42,7 +36,6 @@ export class UserService {
   }
 
   async editOne(_id: string, body: EditUserDTO): Promise<void> {
-    body = { ...body, password: hashSync(body.password) };
     const existUser = await this.userModel.findById(_id);
     if (!existUser) {
       throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);
