@@ -13,7 +13,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuardUser } from '../auth/guards/jwt-auth.guard';
 import { CreateUserDTO } from './dto/create-user.dto';
-import { EditUserDTO } from './dto/update-user.dto';
+import { UpdataUserPasswordDto } from './dto/update-user-password';
 import { User } from './user.interface';
 import { UserService } from './user.service';
 
@@ -43,15 +43,15 @@ export class UserController {
     return await this.userService.addOne(body);
   }
 
-  @ApiOperation({ summary: '修改用户' })
+  @ApiOperation({ summary: '更新密码' })
   @UseGuards(JwtAuthGuardUser)
   @ApiBearerAuth()
-  @Put(':_id')
-  async editOne(
+  @Put('password/:_id')
+  async updatePassword(
     @Param('_id') _id: string,
-    @Body() body: EditUserDTO,
+    @Body() body: UpdataUserPasswordDto,
   ): Promise<void> {
-    return await this.userService.editOne(_id, body);
+    return await this.userService.updatePassword(_id, body);
   }
 
   @ApiOperation({ summary: '删除用户' })
