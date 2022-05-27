@@ -3,10 +3,15 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { TransformInterceptor } from './core/interceptor/transform.interceptor';
 import { HttpExceptionFilter } from './core/filter/http-exception.filter';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  app.useStaticAssets(join(__dirname, '..', 'public/uploads'), {
+    prefix: '/static/',
+  });
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
 

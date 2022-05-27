@@ -6,14 +6,24 @@ import {
   Param,
   Post,
   Put,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuardUser } from '../auth/guards/jwt-auth.guard';
 import { CreateUserDTO } from './dto/create-user.dto';
-import { UpdataUserPasswordDto } from './dto/update-user-password';
+import { UpdateUserAvatarDto } from './dto/update-user-avatar.dto';
+import { UpdataUserPasswordDto } from './dto/update-user-password.dto';
 import { User } from './user.interface';
 import { UserService } from './user.service';
 
@@ -52,6 +62,20 @@ export class UserController {
     @Body() body: UpdataUserPasswordDto,
   ): Promise<void> {
     return await this.userService.updatePassword(_id, body);
+  }
+
+  @ApiOperation({ summary: '更新头像' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: UpdateUserAvatarDto,
+  })
+  @Post('avatar/:_id')
+  @UseInterceptors(FileInterceptor('file'))
+  async updateAvatar(
+    @Param('_id') _id: string,
+    @UploadedFile() upload: any,
+  ): Promise<void> {
+    return await this.userService.updateAvatar(_id, upload);
   }
 
   @ApiOperation({ summary: '删除用户' })

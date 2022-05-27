@@ -1,9 +1,6 @@
 import { Module } from '@nestjs/common';
-import { UserController } from './user.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { userSchema } from './user.schema';
-import { UserService } from './user.service';
-import { UploadService } from '../upload/upload.service';
+import { UploadController } from './upload.controller';
+import { UploadService } from './upload.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { uid } from 'uid';
@@ -20,7 +17,6 @@ const baseHost = baseHosts[NODE_ENV] || {
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'Users', schema: userSchema }]),
     MulterModule.register({
       storage: diskStorage({
         destination: `./${baseHost.uploadPath}uploads/`,
@@ -34,8 +30,8 @@ const baseHost = baseHosts[NODE_ENV] || {
       }),
     }),
   ],
-  controllers: [UserController],
-  exports: [UserService],
-  providers: [UserService, UploadService],
+  controllers: [UploadController],
+  providers: [UploadService],
+  exports: [UploadService],
 })
-export class UserModule {}
+export class UploadModule {}

@@ -7,13 +7,17 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDTO } from './dto/create-user.dto';
-import { UpdataUserPasswordDto } from './dto/update-user-password';
+import { UpdataUserPasswordDto } from './dto/update-user-password.dto';
 import { User } from './user.interface';
 import { compareSync } from 'bcryptjs';
+import { UploadService } from '../upload/upload.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('Users') private readonly userModel: Model<User>) {}
+  constructor(
+    @InjectModel('Users') private readonly userModel: Model<User>,
+    private uploadService: UploadService,
+  ) {}
 
   async findByUsername(username: string) {
     return await this.userModel.findOne({ username }).select('+password');
@@ -56,7 +60,15 @@ export class UserService {
     body.updatedAt = new Date();
     delete body.oldPassword;
     delete body.rePassword;
-    return await this.userModel.findByIdAndUpdate(_id, body);
+    await this.userModel.findByIdAndUpdate(_id, body);
+  }
+
+  async updateAvatar(_id: string, upload: any): Promise<any> {
+    const user = await this.userModel.findById(_id).select('+password');
+    const file = await this.uploadService.uploadFile(upload);
+    user.updatedAt = new Date();
+    user.avatar = file.fileName;
+    await this.userModel.findByIdAndUpdate(_id, user);
   }
 
   async deleteOne(_id: string): Promise<void> {
