@@ -16,8 +16,7 @@ export const userSchema = new Schema({
   },
   avatar: {
     type: String,
-    default:
-      'https://img1.baidu.com/it/u=1434533787,33664708&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500',
+    default: 'fce36ea855c5d71ec2ad7eca34d75fec1653740608542.webp',
   },
   createdAt: {
     type: Date,
