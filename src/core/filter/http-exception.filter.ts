@@ -4,15 +4,26 @@ import {
   ExceptionFilter,
   HttpException,
 } from '@nestjs/common';
+import { Logger } from 'src/libs/log4js';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
+    const request = ctx.getRequest();
     const status = exception.getStatus();
     const exceptionResponse: any = exception.getResponse();
     let validMessage = '';
+
+    const logFormat = ` <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      Request original url: ${request.originalUrl}
+      Method: ${request.method}
+      IP: ${request.ip}
+      Status code: ${status}
+      Response: ${exception.toString()} \n  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      `;
+    Logger.info(logFormat);
 
     for (const key in exception) {
       // console.log(key, exception[key]);
