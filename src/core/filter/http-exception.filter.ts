@@ -40,7 +40,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       : `${status >= 500 ? 'serverice error' : 'client error'}`;
     const errorResponse = {
       data: {},
-      message: validMessage || message,
+      msg: validMessage || message,
       code: -1,
     };
     response.status(status);
